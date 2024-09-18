@@ -1,0 +1,6 @@
+{
+    "SETTINGS_COMMAND_NAME": "settings",
+    "SETTINGS_COMMAND_DESCRIPTION": "Sets the specified text channel as the X in the server.",
+    "SETTINGS_CHANNEL_NAME": "channel",
+    "SETTINGS_CHANNEL_DESCRIPTION": "The text channel to set as the X in the server."
+}

@@ -1,0 +1,12 @@
+version: "3"
+
+services:
+  dixcord:
+    container_name: dixcord
+    image: dixcord/bot:latest
+    build: .
+    env_file:
+      - .env
+    volumes:
+      - .:/app:cached
+    command: python -m bot

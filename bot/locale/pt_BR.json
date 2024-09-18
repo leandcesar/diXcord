@@ -1,0 +1,6 @@
+{
+    "SETTINGS_COMMAND_NAME": "settings",
+    "SETTINGS_COMMAND_DESCRIPTION": "Defina o canal especificado como o X do servidor.",
+    "SETTINGS_CHANNEL_NAME": "canal",
+    "SETTINGS_CHANNEL_DESCRIPTION": "O canal a ser definido como o X do servidor."
+}
