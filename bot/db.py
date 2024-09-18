@@ -6,7 +6,7 @@ import aiofiles
 from bot import config
 
 
-async def save_data(data: dict) -> None:
+async def save_data(data: dict, /) -> None:
     async with aiofiles.open(config.PATH_DATA, "w") as f:
         await f.write(json.dumps(data, indent=4))
 

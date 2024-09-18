@@ -19,8 +19,35 @@ class Events(commands.Cog):
             return None
         channel = await self.bot.fetch_channel(payload.channel_id)
         message = await channel.fetch_message(payload.message_id)
-        if message.author.id == self.bot.user.id:
-            return await update_tweet(self.bot, message)
+        if message.author.id != self.bot.user.id:
+            return None
+        self.bot.logger.debug(
+            f"{message.guild} ({message.guild.id}) "
+            f"#{message.channel} ({message.channel.id}) "
+            f"@{message.author} ({message.author.id}): "
+            f"{message.embeds[0].image.url!r} ({message.id})"
+        )
+        return await update_tweet(message)
+
+    @commands.Cog.listener()
+    async def on_slash_command(self, inter: disnake.CommandInteraction) -> None:
+        self.bot.logger.debug(
+            f"{inter.guild} ({inter.guild.id}) "
+            f"#{inter.channel} ({inter.channel.id}) "
+            f"@{inter.author} ({inter.author.id}): "
+            f"/{inter.application_command.qualified_name} {inter.options}"
+        )
+
+    @commands.Cog.listener()
+    async def on_slash_command_error(self, inter: disnake.CommandInteraction, e: commands.CommandError) -> None:
+        self.bot.logger.error(
+            f"{inter.guild} ({inter.guild.id}) "
+            f"#{inter.channel} ({inter.channel.id}) "
+            f"@{inter.author} ({inter.author.id}): "
+            f"/{inter.application_command.qualified_name} {inter.options} "
+            f"{e}",
+            exc_info=e,
+        )
 
     @commands.Cog.listener()
     async def on_message(self, message: disnake.Message) -> None:
@@ -30,7 +57,13 @@ class Events(commands.Cog):
             return None
         if message.is_system():
             return None
-        return await send_tweet(self.bot, message)
+        self.bot.logger.debug(
+            f"{message.guild} ({message.guild.id}) "
+            f"#{message.channel} ({message.channel.id}) "
+            f"@{message.author} ({message.author.id}): "
+            f"{message.content!r} ({message.id})"
+        )
+        return await send_tweet(message)
 
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, payload: disnake.RawReactionActionEvent) -> None:

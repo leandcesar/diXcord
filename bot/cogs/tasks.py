@@ -1,6 +1,6 @@
 import os
 import time
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 from disnake.ext import commands, tasks
 
@@ -24,9 +24,15 @@ class Tasks(commands.Cog):
             for message in messages[::-1]:
                 if message.author.id == self.bot.user.id:
                     continue
-                if datetime.now(tz=timezone.utc) - message.created_at < timedelta(seconds=20):
+                if datetime.now(tz=UTC) - message.created_at < timedelta(seconds=20):
                     break
-                return await send_tweet(self.bot, message)
+                self.bot.logger.debug(
+                    f"{message.guild} ({message.guild.id}) "
+                    f"#{message.channel} ({message.channel.id}) "
+                    f"@{message.author} ({message.author.id}): "
+                    f"{message.content!r} ({message.id})"
+                )
+                return await send_tweet(message)
 
     @recover_tweets.before_loop
     async def before_recover_tweets(self):
