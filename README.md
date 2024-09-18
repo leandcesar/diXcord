@@ -12,7 +12,7 @@ For fun. (and because 𝕏 was banned in Brazil)
 
 ### Where?
 
-[Click here](https://discord.com/oauth2/authorize?client_id=1197282179546349590&permissions=8&integration_type=0&scope=bot) to add the bot to your Discord server.
+[Click here](https://discord.com/oauth2/authorize?client_id=1281944985398149174&permissions=8&integration_type=0&scope=bot) to add the bot to your Discord server.
 
 ## Developing
 
