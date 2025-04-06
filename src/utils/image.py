@@ -3,13 +3,6 @@ from io import BytesIO
 import aiohttp
 from PIL import Image, ImageChops, ImageOps
 
-__all__ = (
-    "download_image",
-    "crop_image",
-    "trim_image",
-    "overlay_images",
-)
-
 
 async def download_image(url: str, /, *, output_path: str) -> None:
     async with aiohttp.ClientSession() as session:
@@ -72,6 +65,6 @@ def overlay_images(
     base_image = Image.open(base_image_path)
     overlay_image = Image.open(overlay_image_path)
     x_offset = (base_image.width - overlay_image.width) // 2
-    y_offset = (base_image.height - overlay_image.height)
+    y_offset = base_image.height - overlay_image.height
     base_image.paste(overlay_image, (x_offset, y_offset))
     base_image.save(output_path)

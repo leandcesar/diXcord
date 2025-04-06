@@ -1,6 +1,6 @@
 import logging
 
-import disnake  # noqa: F401
+from src import config
 
 
 class LoggingFormatter(logging.Formatter):
@@ -22,7 +22,12 @@ class LoggingFormatter(logging.Formatter):
 
     def format(self, record: logging.LogRecord, /) -> str:
         log_color = self.colors[record.levelno]
-        fmt = "(black){asctime}(reset) (levelcolor){levelname:<8}(reset) (green){name}(reset) {message}"
+        fmt = (
+            "(black){asctime}(reset)"
+            " (levelcolor){levelname}(reset)"
+            " (green){name}.{funcName}()(reset):"
+            " {message}"
+        )
         fmt = fmt.replace("(black)", self.black + self.bold)
         fmt = fmt.replace("(reset)", self.reset)
         fmt = fmt.replace("(levelcolor)", log_color)
@@ -31,13 +36,20 @@ class LoggingFormatter(logging.Formatter):
         return formatter.format(record)
 
 
-console_handler = logging.StreamHandler()
-console_handler.setFormatter(LoggingFormatter())
+formatter = LoggingFormatter()
 
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
-logger.addHandler(console_handler)
+logger = logging.getLogger()
+logger.setLevel(config.LOG_LEVEL)
 
-disnake_logger = logging.getLogger("disnake")
-disnake_logger.setLevel(logging.WARNING)
-disnake_logger.addHandler(console_handler)
+stdout_handler = logging.StreamHandler()
+stdout_handler.setLevel(config.LOG_LEVEL)
+stdout_handler.setFormatter(formatter)
+logger.addHandler(stdout_handler)
+
+logging.getLogger("disnake").setLevel(logging.WARNING)
+
+logger.info("Logging has been initialized")
+
+
+def get_logger(name: str) -> logging.Logger:
+    return logging.getLogger(name)

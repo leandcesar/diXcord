@@ -1,13 +1,9 @@
-from datetime import datetime, timedelta
+import datetime as dt
 
 from playwright.async_api import async_playwright
 
-from bot.components.image import trim_image
 
-__all__ = ("fake_tweet_generator", )
-
-
-async def fake_tweet_generator(
+async def generate_tweet(
     text: str,
     *,
     name: str,
@@ -18,13 +14,12 @@ async def fake_tweet_generator(
     retweets: int = 0,
     likes: int = 0,
     views: int = 0,
-    timestamp: datetime = datetime.utcnow(),
+    now: dt.datetime = dt.datetime.now(dt.timezone.utc) - dt.timedelta(hours=3),
     source: str = "Twitter for Discord",
     theme: str = "Default",
     output_path: str = "tweet.png",
     timeout_ms: float = 60000.0,
 ) -> None:
-    timestamp = timestamp - timedelta(hours=3)  # TODO: don't set the timezone hardcoded
     async with async_playwright() as playwright:
         browser = await playwright.chromium.launch(timeout=timeout_ms, headless=True)
         page = await browser.new_page()
@@ -36,8 +31,8 @@ async def fake_tweet_generator(
         await page.fill("#inputRetweets", str(retweets))
         await page.fill("#inputLikes", str(likes))
         await page.fill("#inputViews", str(views))
-        await page.fill("#inputTime", timestamp.time().isoformat(timespec="minutes"))
-        await page.fill("#inputDate", timestamp.date().isoformat())
+        await page.fill("#inputTime", now.time().isoformat(timespec="minutes"))
+        await page.fill("#inputDate", now.date().isoformat())
         await page.fill("#inputSource", source)
         await page.get_by_title(theme, exact=True).click()
         await page.click("#verifiedButtonNone")
@@ -50,4 +45,3 @@ async def fake_tweet_generator(
         download = await data.value
         await download.save_as(output_path)
         await browser.close()
-    trim_image(output_path)

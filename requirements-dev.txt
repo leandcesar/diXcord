@@ -1,8 +1,8 @@
 -r requirements.txt
-bandit==1.7.8
-black==24.3.0
-isort==5.13.2
-mypy==1.9.0
+bandit==1.8.3
+black==25.1.0
+isort==6.0.0
+mypy==1.15.0
 mypy-extensions==1.0.0
-pre-commit==3.7.0
-ruff==0.0.291
+pre-commit==4.1.0
+ruff==0.9.6

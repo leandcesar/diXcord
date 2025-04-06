@@ -4,9 +4,9 @@ import os
 
 import disnake
 
-from bot import config
-from bot.components.image import crop_image, download_image, overlay_images
-from bot.components.tweet import fake_tweet_generator
+from src import config
+from src.utils.image import crop_image, download_image, overlay_images, trim_image
+from src.utils.tweet_generator import generate_tweet
 
 
 class Tweet:
@@ -37,20 +37,20 @@ class Tweet:
                 text = text.replace(mention.mention, f"@{mention.name}")
             for channel_mention in self.original_message.channel_mentions:
                 text = text.replace(channel_mention.mention, f"#{channel_mention.name}")
-            await fake_tweet_generator(
+            await generate_tweet(
                 text=text,
                 name=self.original_message.author.display_name,
                 username=self.original_message.author.name,
                 avatar_path=self.avatar_path,
                 attachments_path=self.attachments_paths,
-                timestamp=self.original_message.created_at,
+                now=self.original_message.created_at,
                 output_path=self.tweet_path,
             )
+            trim_image(self.tweet_path)
             return self
         raise ValueError("Either 'original_message' or 'tweet_message' must be provided.")
 
-    async def __aexit__(self, exc_type, exc_value, traceback) -> None:
-        ...
+    async def __aexit__(self, exc_type, exc_value, traceback) -> None: ...
 
     @property
     def avatar_path(self) -> str | None:
@@ -109,8 +109,7 @@ class Tweet:
         if os.path.exists(self.avatar_path):
             return None
         await (
-            self.original_message.author.display_avatar
-            .with_size(128)
+            self.original_message.author.display_avatar.with_size(128)
             .with_static_format("png")
             .save(self.avatar_path)
         )
@@ -152,7 +151,7 @@ class Tweet:
         if interactions <= 0:
             return None
         if not os.path.exists(self.statistics_path):
-            await fake_tweet_generator(
+            await generate_tweet(
                 text=" ",
                 name=" ",
                 username=" ",
@@ -162,6 +161,7 @@ class Tweet:
                 likes=self.total_likes,
                 views=interactions,
             )
+            trim_image(self.tweet_path)
             crop_image(self.statistics_path, top=-50)
         overlay_images(
             base_image_path=self.tweet_path,

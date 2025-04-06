@@ -8,13 +8,13 @@
 
 ### Why?
 
-For fun. (and because 𝕏 was banned in Brazil)
+For fun. ~~(and because 𝕏 was banned in Brazil)~~
 
 ### Where?
 
-[Click here](https://discord.com/oauth2/authorize?client_id=1281944985398149174&permissions=8&integration_type=0&scope=bot) to add the bot to your Discord server.
+~~[Click here](https://discord.com/oauth2/authorize?client_id=1281944985398149174&permissions=8&integration_type=0&scope=bot) to add the bot to your Discord server.~~
 
-## Developing
+## Getting Started
 
 ### Prerequisites
 
@@ -25,10 +25,13 @@ For fun. (and because 𝕏 was banned in Brazil)
 ### Installing
 
 1. Clone the repository using [Git](https://git-scm.com/).
+
 ```sh
 git clone git@github.com:leandcesar/diXcord.git
 ```
+
 2. Navigate to the directory.
+
 ```sh
 cd diXcord
 ```
@@ -36,11 +39,14 @@ cd diXcord
 ### Running
 
 3. Ensure you fill in the necessary environment variables in the `.env` file.
-4. Build the Docker service for the application.
+1. Build the Docker service for the application.
+
 ```sh
 make build
 ```
+
 5. Start the application and check if everything is running correctly.
+
 ```sh
 make up
 ```
@@ -48,10 +54,13 @@ make up
 ### Cleaning up
 
 6. Stop and remove Docker containers and networks.
+
 ```sh
 make down
 ```
+
 7. Remove temporary files.
+
 ```sh
 make clean
 ```

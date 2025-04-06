@@ -1,4 +1,4 @@
-.PHONY: help build up down install uninstall reinstall version lint format security clean
+.PHONY: help build up down install uninstall reinstall version lint format security clean all test
 .DEFAULT_GOAL := help
 VENV = venv
 PYTHON = $(VENV)/bin/python3
@@ -15,18 +15,18 @@ endef
 export PRINT_HELP_PYSCRIPT
 
 $(VENV)/bin/activate: requirements-dev.txt requirements.txt
-	@python3 -m venv $(VENV)
+	@python3.10 -m venv $(VENV)
 	@$(PIP) install -U pip
 	@$(PIP) install -r requirements-dev.txt
 
 help:
-	@python3 -c "$$PRINT_HELP_PYSCRIPT" < $(MAKEFILE_LIST)
+	@python3.10 -c "$$PRINT_HELP_PYSCRIPT" < $(MAKEFILE_LIST)
 
 build:
 	@docker-compose build
 
 up:
-	@docker-compose up
+	@docker-compose up dixcord
 
 down:
 	@docker-compose down --rmi all --volumes --remove-orphans
@@ -44,25 +44,33 @@ reinstall: uninstall install
 
 version: $(VENV)/bin/activate
 	@$(PYTHON) --version
-	@$(PIP) freeze
+	@$(PIP) list
+
+security: $(VENV)/bin/activate
+	@$(VENV)/bin/pre-commit run bandit
+	@$(VENV)/bin/pre-commit run gitleaks
+	@$(VENV)/bin/pre-commit run detect-private-key
 
 lint: $(VENV)/bin/activate
 	@$(VENV)/bin/pre-commit run mypy
 	@$(VENV)/bin/pre-commit run ruff
+	@$(VENV)/bin/pre-commit run debug-statements
+	@$(VENV)/bin/pre-commit run validate-pyproject
+	@$(VENV)/bin/pre-commit run check-github-workflows
+	@$(VENV)/bin/pre-commit run check-case-conflict
+	@$(VENV)/bin/pre-commit run check-illegal-windows-names
 
-formatter: $(VENV)/bin/activate
-	@$(VENV)/bin/pre-commit run black
-	@$(VENV)/bin/pre-commit run isort
+format: $(VENV)/bin/activate
 	@$(VENV)/bin/pre-commit run check-docstring-first
+	@$(VENV)/bin/pre-commit run isort
+	@$(VENV)/bin/pre-commit run black
 	@$(VENV)/bin/pre-commit run end-of-file-fixer
 	@$(VENV)/bin/pre-commit run trailing-whitespace
+	@$(VENV)/bin/pre-commit run mdformat
 
-format: formatter
-
-security: $(VENV)/bin/activate
-	@$(VENV)/bin/pre-commit run bandit
-	@$(VENV)/bin/pre-commit run detect-private-key
-	@$(VENV)/bin/pre-commit run debug-statements
+test: $(VENV)/bin/activate
+	@$(VENV)/bin/pre-commit run pytest-collect
+	@$(VENV)/bin/pre-commit run pytest-fast
 
 clean:
 	-@rm -fr build/
@@ -76,7 +84,7 @@ clean:
 	-@find . -name '__pycache__' -exec rm -fr {} +
 	-@rm -fr .tox/
 	-@rm -fr .nox/
-	-@rm -f .coverage
+	-@rm -fr .coverage
 	-@rm -fr htmlcov/
 	-@rm -fr .pytest_cache
 	-@rm -fr .mypy_cache
